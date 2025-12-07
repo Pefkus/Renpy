@@ -2,9 +2,11 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 53: Line is indented, but the preceding say statement statement does not expect a block. Please check this line's indentation. You may have forgotten a colon (:).
-    "Szczerze? Nie czuję się najlepiej.":
-    ^
+The label start is defined twice, at File "game/script.rpy", line 40:
+label start :
+and File "game/script.rpy", line 62:
+label start:
+
 
 Ren'Py Version: Ren'Py 8.4.1.25072401
-Sun Dec  7 18:56:16 2025
+Sun Dec  7 19:58:14 2025

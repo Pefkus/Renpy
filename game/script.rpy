@@ -37,27 +37,6 @@ default backpack = Inventory()
 define key_item = Item("Klucz", "key_idle", "key_hover")
 define apple_item = Item("Jabłko", "apple_idle", "apple_hover")
 
-label start:
-    scene black
-    "Zacznijmy. Twój plecak jest pusty."
-
-    # Dodajemy przedmioty w konkretnych miejscach (piksele względem ramki plecaka)
-    # x=100, y=200
-    $ backpack.add(key_item, 100, 200)
-    
-    # x=400, y=350 (zupełnie inne miejsce)
-    $ backpack.add(apple_item, 400, 350)
-
-    "Dodałem przedmioty w losowych miejscach. Otwórz plecak, aby zobaczyć."
-
-    show screen messy_inventory
-    
-    # Czekamy na kliknięcie w przedmiot (screen zwraca nazwę przedmiotu przez 'Return')
-    $ result = ui.interact()
-
-    "Kliknąłeś w: [result]!"
-
-    return
 # ----- START GRY--------
 label start:
     scene bg start 
@@ -97,7 +76,7 @@ label start:
         "(Milcz)":  
             ja "Huuuh...?"
             hide hero_poczatek
-            show NormalnaMina at left
+            show hero_wystraszony at left
             
     #Kod tutaj wykonuje się po zakończeniu wyboru
     r "W każdym razie, cieszę się, że tu jesteś."

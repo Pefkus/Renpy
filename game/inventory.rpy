@@ -1,19 +1,20 @@
+# ---------------------- 1. KOD PYTHON (KLASY) ----------------------
 init python:
-    # 1. Definicja samego przedmiotu (statystyki + wygląd)
+    # Definicja samego przedmiotu (statystyki + wygląd)
     class Item:
         def __init__(self, name, idle_img, hover_img):
             self.name = name
             self.idle_img = idle_img   # Obrazek normalny
             self.hover_img = hover_img # Obrazek po najechaniu myszką
 
-    # 2. Pomocnicza klasa dla przedmiotu leżącego w plecaku (Przedmiot + Pozycja)
+    # Pomocnicza klasa dla przedmiotu leżącego w plecaku (Przedmiot + Pozycja)
     class InventorySlot:
         def __init__(self, item, x, y):
             self.item = item
             self.x = x
             self.y = y
 
-    # 3. Zarządzanie ekwipunkiem
+    # Zarządzanie ekwipunkiem
     class Inventory:
         def __init__(self):
             self.slots = [] # Lista przedmiotów wraz z ich pozycjami
@@ -28,55 +29,54 @@ init python:
             if slot in self.slots:
                 self.slots.remove(slot)
 
----------------------- INVENTORY---------------------------------------
+# ---------------------- 2. EKRAN PLECAKA (SCREEN) ----------------------
+# To musi być POZA blokiem init python!
 
-screen messy_inventory():
-    modal True
-    
-    # Półprzezroczyste tło
-    add Solid("#5bc4adaa")
-
-    # Obszar plecaka (np. grafika otwartej torby)
+screen plecak_screen():
+    modal True # Blokuje klikanie w grę pod spodem
+    zorder 100 # Wyświetla się nad wszystkim innym
     frame:
         align (0.5, 0.5)
-        xsize 800
-        ysize 600
-        background Solid("#333333") # Tu wstawisz tło np. "bag_bg.png"
+        xsize 1920  # <--- Tu ustawiasz szerokość swojego obrazka tła
+        ysize 1080  # <--- Tu ustawiasz wysokość swojego obrazka tła
+        
+        background "plecak.png"
 
-        text "Mój Bałagan" xalign 0.5 yalign 0.05 color "#FFF"
+        textbutton "Zamknij":
+            align (0.98, 0.02)
+            action Hide("plecak_screen")
 
-        # Kontener 'fixed' pozwala na swobodne rozmieszczanie dzieci
-        fixed:
-            # Iterujemy przez wszystkie przedmioty w plecaku
-            for slot in backpack.slots:
+        # --- WYŚWIETLANIE PRZEDMIOTÓW ---
+        # Iterujemy przez listę slotów z Twojej klasy Inventory
+        for slot in plecak.slots:
+            imagebutton:
+                idle slot.item.idle_img
+                hover slot.item.hover_img
                 
-                imagebutton:
-                    # Wygląd
-                    idle slot.item.idle_img
-                    hover slot.item.hover_img
-                    
-                    # Pozycja (bierzemy z obiektu InventorySlot)
-                    pos (slot.x, slot.y)
-                    
-                    # Dźwięk po najechaniu (opcjonalnie)
-                    hover_sound "audio/click.ogg" 
-                    
-                    # Akcja po kliknięciu (np. usunięcie lub opis)
-                    action Return(slot.item.name) 
-                    
-                    # Tooltip (dymek z nazwą po najechaniu)
-                    tooltip slot.item.name
+                # Używamy X i Y z Twojej klasy InventorySlot
+                pos (slot.x, slot.y)
+                
+                # Co się dzieje po kliknięciu? Na razie wyświetlmy nazwę
+                action Notify("To jest: " + slot.item.name)
+                
+                # Dymek z nazwą po najechaniu myszką
+                tooltip slot.item.name
 
-            # Obsługa tooltipa (wyświetla nazwę przedmiotu, na który najechałeś)
-            $ tooltip = GetTooltip()
-            if tooltip:
-                text "[tooltip]":
-                    color "#FFF"
-                    outlines [(2, "#000", 0, 0)]
-                    pos (renpy.get_mouse_pos()) # Tekst podąża za myszką
-                    yoffset -30
+    # Obsługa tooltipa (wyświetlanie nazwy po najechaniu)
+    $ tooltip = GetTooltip()
+    if tooltip:
+        text "[tooltip]":
+            align (0.5, 0.1)
+            size 40
+            color "#fff"
+            outlines [(2, "#000", 0, 0)]
 
-    # Przycisk wyjścia
-    textbutton "Zamknij":
-        align (0.9, 0.1)
-        action Hide("messy_inventory")
+# ---------------------- 3. ZMIENNE GRY (DEFINICJE) ----------------------
+# Tworzymy instancję plecaka
+default plecak = Inventory()
+
+# Definiujemy przedmioty
+# Pamiętaj, żeby nazwy plików (np. "lom.png") istniały w folderze images!
+define przedmiot_lom = Item("Łom", "lom.png", "lom.png") 
+define przedmiot_mapa = Item("Mapa", "mapa.png", "mapa.png")
+define przedmiot_karta = Item("Karta", "karta.png", "karta.png")
