@@ -44,20 +44,20 @@ label start:
     r "Chyba za mocno ci wtedy przyjebałem.. No nic"
     r "Witaj w Bunkrze ... . Jestem Pan Radio. Twoim jedynym i ostatnim przyjacielem."
     label Choice:   
-        menu:
+    menu:
         "Co jej odpowiesz?"
-        "Nic mi nie jest. Po prostu się zamyśliłem.":
+
+        "Nic mi nie jest. Po prostu się zamyśliłem." :
                 
-                ja "Nie, wszystko w porządku. Po prostu... zamyśliłem się na chwilę."
-        "Szczerze? Nie czuję się najlepiej.":
+            ja "Nie, wszystko w porządku. Po prostu... zamyśliłem się na chwilę."
+            "Szczerze? Nie czuję się najlepiej."
                     
             ja "Jeśli mam być szczery, to nie jest to mój najlepszy dzień."
             radio "Och... Chcesz o tym porozmawiać?"
-
-                 
-        "(Milcz)":
             
-                ja "..."
+        "(Milcz)":  
+            
+            ja "..."
        
     #Kod tutaj wykonuje się po zakończeniu wyboru
     radio "W każdym razie, cieszę się, że tu jesteś."
@@ -72,48 +72,6 @@ label start:
     r "Eksploruj. Kombinuj. I na litość boską, nie dotykaj czerwonych przycisków......"
     hide radio    
     "Drzwi od mojego pokoju są zamknięte. Co chcesz zrobić?"
-
-
-
-
-
-
-JEBNAL PRONT
-TŁO
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #    ## show radio at right
