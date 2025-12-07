@@ -78,7 +78,7 @@ label start:
     r "Eksploruj. Kombinuj. I na litość boską, nie dotykaj czerwonych przycisków......"
     hide radio    
     ja "Psia mać! muszę coś wykombinować bo oszaleje.."
-    "Drzwi są zamknięte"
+    "Drzwi są zamknięte."
     hide hero_poczatek
 
 
