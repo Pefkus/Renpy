@@ -19,7 +19,7 @@ init python:
         def __init__(self):
             self.slots = [] # Lista przedmiotów wraz z ich pozycjami
 
-        # Metoda dodawania wymaga teraz podania pozycji X i Y
+        # Metoda dodawania wymaga podania pozycji X i Y
         def add(self, item, x, y):
             new_slot = InventorySlot(item, x, y)
             self.slots.append(new_slot)
@@ -30,65 +30,76 @@ init python:
                 self.slots.remove(slot)
 
 # ---------------------- 2. EKRAN PLECAKA (SCREEN) ----------------------
-# To musi być POZA blokiem init python!
-
 screen plecak_screen():
-    modal True # Blokuje klikanie w grę pod spodem
-    zorder 100 # Wyświetla się nad wszystkim innym
-    frame:
-        align (0.5, 0.5)
-        xsize 1920  # <--- Tu ustawiasz szerokość swojego obrazka tła
-        ysize 1080  # <--- Tu ustawiasz wysokość swojego obrazka tła
-        
-        background "plecak.png"
+    modal True   # Blokuje klikanie w grę pod spodem
+    zorder 100   # Wyświetla się nad wszystkim innym
+    
+    # Używamy fixed zamiast frame, żeby mieć pełną kontrolę nad pozycjami
+    fixed:
+        # 1. TŁO (Musi być pierwsze, żeby było na spodzie)
+        add "plecak.png":
+            align (0.5, 0.5) 
+            # xsize 1920 # Odkomentuj, jeśli chcesz wymusić rozmiar
+            # ysize 1080
 
-        textbutton "Zamknij":
-            align (0.98, 0.02)
-            action Hide("plecak_screen")
-
-        # --- WYŚWIETLANIE PRZEDMIOTÓW ---
-        # Iterujemy przez listę slotów z Twojej klasy Inventory
-        for slot in plecak.slots:
+        # 2. PRZEDMIOTY (Rysowane NA tle)
+        # UWAGA: Używamy nazwy 'backpack', żeby zgadzała się z Twoim script.rpy!
+        for slot in backpack.slots:
             imagebutton:
                 idle slot.item.idle_img
                 hover slot.item.hover_img
                 
-                # Używamy X i Y z Twojej klasy InventorySlot
+                # --- NAPRAWA PROBLEMU Z ZASŁANIANIEM ---
+                focus_mask True  ### <--- TO SPRAWIA, ŻE KLIKASZ TYLKO W KSZTAŁT, A NIE W PRZEZROCZYSTOŚĆ
+                # ---------------------------------------
+
+                # Pozycja (liczona od lewego górnego rogu ekranu)
                 pos (slot.x, slot.y)
                 
-                # Co się dzieje po kliknięciu? Na razie wyświetlmy nazwę
                 action Notify("To jest: " + slot.item.name)
-                
-                # Dymek z nazwą po najechaniu myszką
                 tooltip slot.item.name
 
-    # Obsługa tooltipa (wyświetlanie nazwy po najechaniu)
+        # 3. PRZYCISK ZAMKNIJ (Na samym wierzchu)
+        textbutton "Zamknij":
+            align (0.95, 0.05) # Prawy górny róg
+            text_size 40       # Większy tekst
+            text_color "#ffffff" 
+            action Hide("plecak_screen")
+
+    # Obsługa dymków (tooltip) - wyświetla nazwę przedmiotu
     $ tooltip = GetTooltip()
     if tooltip:
         text "[tooltip]":
-            align (0.5, 0.1)
+            align (0.5, 0.9) # Wyświetl nazwę na dole ekranu
             size 40
             color "#fff"
             outlines [(2, "#000", 0, 0)]
 
-# ---------------------- 3. ZMIENNE GRY (DEFINICJE) ----------------------
-# Tworzymy instancję plecaka
-default plecak = Inventory()
-
-# Definiujemy przedmioty
-# Pamiętaj, żeby nazwy plików (np. "lom.png") istniały w folderze images!
-define przedmiot_lom = Item("Łom", "lom.png", "lom.png") 
-define przedmiot_mapa = Item("Mapa", "mapa.png", "mapa.png")
-define przedmiot_karta = Item("Karta", "karta.png", "karta.png")
-
-#----------------------------- IKONA PLECAK ------------------------------------
+# ---------------------- 3. EKRAN IKONKI (HUD) ----------------------
 screen plecak_ikona():
-    zorder 90 # Warstwa poniżej otwartego plecaka (żeby plecak przykrył ikonę jak się otworzy)
+    zorder 90 # Warstwa poniżej otwartego plecaka
     
     imagebutton:
-        # Grafiki ikony (musisz je mieć w folderze images)
+        # Ustawiamy w prawym górnym rogu z małym odstępem
+        align (0.95, 0.05) 
+        
+        # Grafiki ikony
         idle "ikona_plecaka.png" 
-        hover "ikona_plecaka_hover.png" # Opcjonalne: inna grafika jak najedziesz myszką
-        focus_mask True
+        hover "ikona_plecaka_hover.png" # Jeśli nie masz hovera, usuń tę linię
+        
+        # focus_mask sprawia, że klikasz tylko w narysowaną torbę, a nie w przezroczyste tło
+        focus_mask True 
+        
         # Akcja po kliknięciu
         action Show("plecak_screen")
+
+# ---------------------- 4. ZMIENNE GRY (DEFINICJE) ----------------------
+
+# WAŻNE: Nazwa zmiennej to 'backpack', żeby pasowała do kodu w script.rpy ($ backpack.add)
+default backpack = Inventory()
+
+# Definiujemy przedmioty
+define przedmiot_lom = Item("ŁOM", "lom.png", "lom_hover.png")
+define przedmiot_karta = Item("KARTA DOSTĘPU", "karta.png", "karta_hover.png")
+define przedmiot_latarka = Item("LATARKA", "latarka.png", "latarka_hover.png")
+define przedmiot_bezpiecznik = Item("BEZPIECZNIK", "bezpiecznik.png", "bezpiecznik_hover.png")

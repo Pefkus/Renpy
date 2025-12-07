@@ -3,17 +3,6 @@ default player_name = "hero"
 define ja = Character("[player_name]", who_color="#00ccff")
 define r = Character("Radio",who_color="#1bdb8b")
 define m = Character("???",who_color="#ff0000") # Potwór
-
-## Definicje przedmiotów 
-define lom = Item("Łom", "latarka.png", "latarka_hover.png")
-define latarka = Item("Latarka", "latarka.png", "latarka_hover.png")
-
-
-
-
-
-
-
 ## zmienne logiczne ( flagi) do śledzenia postępów
 default ma_lom = False
 default ma_latarke = False
@@ -39,22 +28,20 @@ image bg serwerownia ="komputerownia"
 image bg zbrojownia ="zbrojownia"
 image bg drzwi_wyjsciowe ="drzwi_wyjscie"
 
-
-
-# ----- INVENTORY ------------
-# Inicjalizacja
-default backpack = Inventory()
-
-# Definiujemy przedmioty używając nazw obrazków z Kroku 2
-define key_item = Item("Klucz", "key_idle", "key_hover")
-define apple_item = Item("Jabłko", "apple_idle", "apple_hover")
-
 # ----- START GRY--------
 label start:
     show screen plecak_ikona
     scene bg PokojStartowy 
-    
-
+#--------------------------------to je muj test-------
+    $ backpack.add(przedmiot_bezpiecznik, 0, 0)
+    $ ma_bezpiecznik = True
+    $ backpack.add(przedmiot_karta, 0, 0)
+    $ ma_karta_dostepu = True
+    $ backpack.add(przedmiot_lom, 0, 0)
+    $ ma_lom = True
+    $ backpack.add(przedmiot_latarka, 0, 0)
+    $ ma_latarke = True
+#------------------tak ma być przez u ------------------------
     "Budzi cię potworny ból głowy. Wokół panuje półmrok, a powietrze pachnie stęchlizną i metalem."
     "Próbujesz wstać, ale przez silne zawroty głowy, twoje ciało odmawia posłuszeństwa"
     "Przez silne zawroty wydaje ci się że słyszysz znajomy głos, ale nic ci nieprzychodzi do głowy"
@@ -120,7 +107,7 @@ label start:
                 ja "Kurde potrzebuje jakiegoś narzedzia.."
                 hide hero_poczatek
                 show hero_wkurw
-                ja "ale tak tu kurwa ciemno że nic niewidzę"
+                ja "ale tak tu kurwa ciemno że nic nie widzę"
                 hide hero_wkurw
                 jump cos
                 
@@ -135,7 +122,7 @@ label start:
                     jump cos
                 else:
                     "powoli podchodzisz do szafki, zauważasz na niej latarkę."
-                    $ backpack.add(przedmiot_latarka, 100, 100)
+                    $ backpack.add(przedmiot_latarka, 0, 0)
                     $ ma_latarke = True
                 show hero_podstawowy2 at left
                 ja "Super! W końcu coś przydatnego."
