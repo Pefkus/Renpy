@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 138: Line is indented, but the preceding say statement statement does not expect a block. Please check this line's indentation. You may have forgotten a colon (:).
-    hide hero_podstawowy2
+File "game/script.rpy", line 200: expected a keyword argument or child statement.
+    $ backpack.add(przedmiot_latarka, 0, 0)
     ^
 
 Ren'Py Version: Ren'Py 8.4.1.25072401
-Sun Dec  7 21:55:54 2025
+Sat Dec 27 23:11:19 2025
