@@ -1,23 +1,38 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
-While running game code:
-  File "game/script.rpy", line 891, in script
-    jump Generator_Interakcje
-renpy.script.LabelNotFound: could not find label 'Generator_Interakcje'.
+While loading <renpy.display.im.Image object ('images/przedmiot_drzwi_serwerownia_ciemne_zamkniete_hover.png') at 0x0000000008f0d4f0>:
+  File "game/script.rpy", line 385, in script
+    call screen Pokój_Korytarz_klikanie
+Exception: renpy.restart_interaction() was called 100 times without processing any input.
 
 -- Full Traceback ------------------------------------------------------------
 
 Traceback (most recent call last):
-  File "game/script.rpy", line 891, in script
-    jump Generator_Interakcje
-  File "renpy/ast.py", line 1928, in execute
-    rv = renpy.game.script.lookup(target)
-         ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
-  File "renpy/script.py", line 1161, in lookup
-    raise LabelNotFound(original)
-renpy.script.LabelNotFound: could not find label 'Generator_Interakcje'.
+  File "game/script.rpy", line 385, in script
+    call screen Pokój_Korytarz_klikanie
+  File "renpy/ast.py", line 2231, in execute
+    self.call("execute")
+    ~~~~~~~~~^^^^^^^^^^^
+  File "renpy/ast.py", line 2195, in call
+    return renpy.statements.call(method, parsed, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/statements.py", line 379, in call
+    return method(parsed, *args, **kwargs)
+           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/common/000statements.rpy", line 695, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+                    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/exports/statementexports.py", line 348, in call_screen
+    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/ui.py", line 304, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "renpy/display/core.py", line 2217, in interact
+    raise Exception("renpy.restart_interaction() was called 100 times without processing any input.")
+Exception: renpy.restart_interaction() was called 100 times without processing any input.
 
 Windows-11-10.0.26200-SP0 AMD64
 Ren'Py 8.4.1.25072401
 PROJEKT ARKA 
-Mon Dec 29 17:26:56 2025
+Mon Dec 29 21:58:30 2025

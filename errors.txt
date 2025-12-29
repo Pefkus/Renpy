@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 719: expected ':' not found.
-    else
+File "game/script.rpy", line 945: 'scene' is not a keyword argument or valid child of the screen statement.
+    scene bg apteka1 with fade
          ^
 
 Ren'Py Version: Ren'Py 8.4.1.25072401
-Mon Dec 29 17:51:02 2025
+Mon Dec 29 21:52:16 2025

@@ -8,10 +8,10 @@ define m = Character("???", who_color="#ff0000") # Potwór
 # Ekwipunek podstawowy
 default ma_lom = False
 default ma_latarke = False
-default ma_bezpiecznik = False # Ze szpitala
-default ma_karta_dostepu = False # Do szpitala (znaleziona w generatorze)
+default ma_bezpiecznik = False 
+default ma_karta_dostepu = False 
 default ma_mapa = False
-default prad_wlaczony = False
+default prad_wlaczony = False  #zmienić na False
 
 # Lokacje i stany
 default zbrojownia_otwarta = False
@@ -33,6 +33,7 @@ default narzedzia_sprzatniete = False
 # Szpital
 default szpital_otwarty_odwiedzony = False
 default szpital_otwarty = False
+
 
 # Jadalnia
 default stoufka_otwarta = False
@@ -78,6 +79,8 @@ image bg terminal_hacking = Solid("#001100")
 #---------------JADALNIOWY STOLIK------
 image bg stolik_zblizenie_bg = "stolik_zblizenie" # Twoje tło zbliżenia na stół
 image monster_boss = "unnamed" # Potwór z głową TV
+image bg apteczka_zblizenie = "apteczka_zblizenie_no"   ######DODAĆ
+image bg apteczka_zblizenie_pront = "apteczka_zblizenie"
 
 # ------------------------------------------------------Tutaj sobie możesz sceny na starcie pominąć niebedzie potrzeby przeklikiwania :3
 label start:  
@@ -88,7 +91,7 @@ label start:
 
 #endregion 
     label początek_gry:
-
+        
         scene black with dissolve
         stop music fadeout 2.0
         
@@ -335,7 +338,8 @@ label powrot_do_korytarza:
         scene bg Korytarz
     else:
         scene bg Korytarz_no_light
-
+    $ stoufka_otwarta = True
+    $ stoufka = True
     if(serwerownia_otwarta == True and zbrojownia_otwarta == False):
         "Krzyk bytu w oddali ucichał, gdy opuszczałeś pokój. Twoje kroki odbijały się echem od zimnych ścian korytarza."
         "Nagle coraz dokładniej słyszysz dźwięk skrobania metalu o metal. Coś przesuwa się w wentylacji."
@@ -704,8 +708,8 @@ screen Generator_Interakcje():
     imagebutton:
         xpos 0 ypos 0
         if prad_wlaczony: 
-            idle "images/generator_maszyna_idle.png"
-            hover "images/generator_maszyna_hover.png"
+            idle "images/generator_maszyna_pront_idle.png"
+            hover "images/generator_maszyna_pront_hover.png"
         else:
             idle "images/generator_maszyna_idle.png"
             hover "images/generator_maszyna_hover.png"
@@ -723,16 +727,20 @@ screen Generator_Interakcje():
         else:
             idle "images/drzwi_na_korytarz_idle.png"
             hover "images/drzwi_na_korytarz_hover.png"
-        
         focus_mask True
         action [SetVariable("interakcja_tooltip", ""), Jump("powrot_do_korytarza")]
         hovered SetVariable("interakcja_tooltip", "DRZWI DO: KORYTARZA")
         unhovered SetVariable("interakcja_tooltip", "")
+
     # 4. STÓŁ WARSZTATOWY (Otwiera zbliżenie stołu)
     imagebutton:
-        xpos 0 ypos 0 
-        idle "images/stol_warsztatowy_idle.png"
-        hover "images/stol_warsztatowy_hover.png"
+        xpos 0 ypos 0
+        if prad_wlaczony:
+            idle "images/stol_warsztatowy_pront_idle.png"
+            hover "images/stol_warsztatowy_pront_hover.png"
+        else: 
+            idle "images/stol_warsztatowy_idle.png"
+            hover "images/stol_warsztatowy_hover.png"
         focus_mask True
         action Show("stol_zblizenie")
         hovered SetVariable("interakcja_tooltip", "SPRAWDŹ STÓŁ")
@@ -745,7 +753,10 @@ screen Generator_Interakcje():
 screen mapa_zblizenie():
     modal True
     zorder 160
-    add "images/mapa_kadr_bg.png"
+    if prad_wlaczony:
+        add "images/mapa_kadr_pront_bg.png"
+    else:
+        add "images/mapa_kadr_bg.png"
 
     if interakcja_tooltip != "":
         frame:
@@ -771,7 +782,10 @@ screen mapa_zblizenie():
 screen stol_zblizenie():
     modal True
     zorder 160
-    add "images/stol_zblizenie_bg.png"
+    if prad_wlaczony:
+        add "images/stol_zblizenie_pront_bg.png"
+    else:
+        add "images/stol_zblizenie_bg.png"
 
     if interakcja_tooltip != "":
         frame:
@@ -817,9 +831,13 @@ screen stol_zblizenie():
     # PUDŁO (Pojawia się tylko gdy narzedzia_odlozone == 3)
     else:
         imagebutton:
-            xpos 0 ypos 0 
-            idle "images/pudlo_generator_idle.png"
-            hover "images/pudlo_generator_hover.png"
+            xpos 0 ypos 0
+            if prad_wlaczony:
+                idle "images/pudlo_generator_pront_idle.png"
+                hover "images/pudlo_generator_pront_hover.png"
+            else: 
+                idle "images/pudlo_generator_idle.png"
+                hover "images/pudlo_generator_hover.png"
             focus_mask True
             action Show("pudlo_zblizenie") 
             hovered SetVariable("interakcja_tooltip", "OTWÓRZ PUDŁO")
@@ -833,7 +851,10 @@ screen stol_zblizenie():
 screen pudlo_zblizenie():
     modal True
     zorder 170
-    add "images/pudlo_wnetrze_bg.png"
+    if prad_wlaczony:
+        add "images/pudlo_wnetrze_pront_bg.png"
+    else:
+        add "images/pudlo_wnetrze_bg.png"
 
     if interakcja_tooltip != "":
         frame:
@@ -905,17 +926,17 @@ label interakcja_generator_maszyna:
     call screen Generator_Interakcje
 
 #region SZPITAL
-# ------------------------------------------------------------------------------------------------
-# POKÓJ 1: GŁÓWNA SALA ZABIEGOWA
-# ------------------------------------------------------------------------------------------------
+
+# --- 2. GŁÓWNY LABEL WEJŚCIOWY ---
 label szpital_label:
     if prad_wlaczony:
         scene bg apteka1 with fade
     else:
         scene bg apteka1_no with fade
 
-    # Dialog odtwarzany tylko przy pierwszym wejściu
+    # Dialog i losowanie tylko przy pierwszej wizycie
     if not szpital_otwarty_odwiedzony:
+        $ ktora_apteczka_ma_bezpiecznik = renpy.random.randint(1, 3) 
         $ szpital_otwarty_odwiedzony = True
         
         "Syk rygli magnetycznych przecina ciszę. Drzwi rozsuwają się z oporem."
@@ -935,8 +956,9 @@ label szpital_label:
 
     call screen Szpital_Pokoj1_Screen
 
+# --- 3. EKRAN POKOJU 1 (SALA ZABIEGOWA) ---
 screen Szpital_Pokoj1_Screen():
-    use plecak_ikona # Wyświetla ikonkę plecaka w rogu
+    use plecak_ikona 
 
     if interakcja_tooltip != "":
         frame:
@@ -945,45 +967,58 @@ screen Szpital_Pokoj1_Screen():
             xalign 0.5 yalign 0.1
             text "[interakcja_tooltip]" size 24 color "#fff" outlines [(2,"#000", 0,0)]
 
-    # 1. PRZEJŚCIE DO POKOJU 2 (Strzałka w prawo / Drzwi)
+    # PRZEJŚCIE DO ZAPLECZA
     imagebutton:
-        xpos 0 ypos 0 # Ustaw to na drzwiach/przejściu po prawej stronie ekranu
-        if prad_wlaczony
+        xpos 0 ypos 0 
+        focus_mask True
+        if prad_wlaczony:
             idle "images/strzalka_prawo_idle.png" 
             hover "images/strzalka_prawo_hover.png"
         else:
             idle "images/strzalka_prawo_bez_swiatla_idle.png" 
             hover "images/strzalka_prawo_bez_swiatla_hover.png"
-        focus_mask True
         action [SetVariable("interakcja_tooltip", ""), Jump("szpital_pokoj2_label")]
         hovered SetVariable("interakcja_tooltip", "IDŹ NA ZAPLECZE")
         unhovered SetVariable("interakcja_tooltip", "")
 
-    # 2. STÓŁ ZABIEGOWY (Flavor Text - Budowanie klimatu)
+    # STÓŁ 
     imagebutton:
-        xpos 0 ypos 0 # Ustaw na środku, tam gdzie stoi łóżko
-        idle "images/niewidzialny_kwadrat.png" # Użyj przezroczystego pliku png, żeby pole było klikalne
-        hover "images/niewidzialny_kwadrat.png"
+        xpos 0 ypos 0 
+        focus_mask True
+        if prad_wlaczony:
+            idle "images/stol_zabiegowy_apteka_idle.png" 
+            hover "images/stol_zabiegowy_apteka_hover.png"
+        else:
+            idle "images/stol_zabiegowy_apteka_bez_swiatla_idle.png" 
+            hover "images/stol_zabiegowy_apteka_bez_swiatla_hover.png"
         action Jump("szpital_stol_dialog")
         hovered SetVariable("interakcja_tooltip", "ZBADAJ STÓŁ")
         unhovered SetVariable("interakcja_tooltip", "")
 
-    # 3. POWRÓT NA KORYTARZ
-    textbutton "DRZWI DO: KORYTARZA":
-        align (0.05, 0.95)
-        action [SetVariable("interakcja_tooltip", ""), Jump("powrot_do_korytarza")]
+    # POWRÓT NA KORYTARZ
+    imagebutton:
+        xpos 0 ypos 0 
+        focus_mask True
+        if prad_wlaczony:
+            idle "images/drzwi_wyjsciowe_korytarz_idle.png" 
+            hover "images/drzwi_wyjsciowe_korytarz_hover.png"
+        else:
+            idle "images/drzwi_wyjsciowe_korytarz_bez_swiatla_idle.png" 
+            hover "images/drzwi_wyjsciowe_korytarz_bez_swiatla_hover.png"
 
-# ------------------------------------------------------------------------------------------------
-# POKÓJ 2: ZAPLECZE / MAGAZYN
-# ------------------------------------------------------------------------------------------------
+        action [SetVariable("interakcja_tooltip", ""), Jump("powrot_do_korytarza")]
+        hovered SetVariable("interakcja_tooltip", "POWRÓT NA KORYTARZ")
+        unhovered SetVariable("interakcja_tooltip", "")
+
+# --- 4. LABEL I EKRAN POKOJU 2 (ZAPLECZE Z 3 APTECZKAMI) ---
 label szpital_pokoj2_label:
     if prad_wlaczony:
-        scene bg apteka2_no with fade
+        scene bg apteka2 with fade
     else:
         scene bg apteka2_no with fade
 
     if not ma_bezpiecznik:
-        ja "Jestem na zapleczu. Musi tu gdzieś być ta apteczka z częściami zamiennymi."
+        ja "Jestem na zapleczu. Gdzieś tu musi być sprawny bezpiecznik."
     
     call screen Szpital_Pokoj2_Screen
 
@@ -997,33 +1032,70 @@ screen Szpital_Pokoj2_Screen():
             xalign 0.5 yalign 0.1
             text "[interakcja_tooltip]" size 24 color "#fff" outlines [(2,"#000", 0,0)]
 
-    # 1. APTECZKA (Na półce/biurku) - To otwiera zbliżenie!
+    # APTECZKA NR 1
     imagebutton:
-        xpos 0 ypos 0 # Dopasuj do miejsca, gdzie leży apteczka na Twoim obrazku (np. na szafce po lewej)
-        idle "images/apteczka_world_idle.png" # Mała ikonka apteczki wklejona w tło (lub przezroczysty przycisk, jeśli jest w tle)
-        hover "images/apteczka_world_hover.png"
+        xpos 0 ypos 0 
         focus_mask True
-        action Show("Szpital_Apteczka_Screen")
-        hovered SetVariable("interakcja_tooltip", "PRZESZUKAJ APTECZKĘ")
+        if prad_wlaczony:
+            idle "images/apteczka_world1_idle.png" 
+            hover "images/apteczka_world1_hover.png"
+        else:
+            idle "images/apteczka_world1_bez_swiatla_idle.png" 
+            hover "images/apteczka_world1_bez_swiatla_hover.png"
+        action Show("Szpital_Apteczka_Screen", nr=1)
+        hovered SetVariable("interakcja_tooltip", "PRZESZUKAJ LEWĄ APTECZKĘ")
         unhovered SetVariable("interakcja_tooltip", "")
 
-    # 2. WRÓĆ DO POKOJU 1
+    # APTECZKA NR 2
     imagebutton:
-        xpos 0 ypos 0 # Lewa strona ekranu
-        idle "images/strzalka_lewo_idle.png" 
-        hover "images/strzalka_lewo_hover.png"
+        xpos 0 ypos 0 
         focus_mask True
+        if prad_wlaczony:
+            idle "images/apteczka_world2_idle.png" 
+            hover "images/apteczka_world2_hover.png"
+        else:
+            idle "images/apteczka_world2_bez_swiatla_idle.png" 
+            hover "images/apteczka_world2_bez_swiatla_hover.png"
+        action Show("Szpital_Apteczka_Screen", nr=2)
+        hovered SetVariable("interakcja_tooltip", "PRZESZUKAJ ŚRODKOWĄ APTECZKĘ")
+        unhovered SetVariable("interakcja_tooltip", "")
+
+    # APTECZKA NR 3
+    imagebutton:
+        xpos 0 ypos 0 
+        focus_mask True
+        if prad_wlaczony:
+            idle "images/apteczka_world3_idle.png" 
+            hover "images/apteczka_world3_hover.png"
+        else:
+            idle "images/apteczka_world3_bez_swiatla_idle.png" 
+            hover "images/apteczka_world3_bez_swiatla_hover.png"
+        action Show("Szpital_Apteczka_Screen", nr=3)
+        hovered SetVariable("interakcja_tooltip", "PRZESZUKAJ PRAWĄ APTECZKĘ")
+        unhovered SetVariable("interakcja_tooltip", "")
+
+    # POWRÓT DO SALI GŁÓWNEJ
+    imagebutton:
+        xpos 0 ypos 0 
+        focus_mask True
+        if prad_wlaczony:
+            idle "images/strzalka_lewo_idle.png" 
+            hover "images/strzalka_lewo_hover.png"
+        else:
+            idle "images/strzalka_lewo_bez_swiatla_idle.png" 
+            hover "images/strzalka_lewo_bez_swiatla_hover.png"
         action [SetVariable("interakcja_tooltip", ""), Jump("szpital_label")]
         hovered SetVariable("interakcja_tooltip", "WRÓĆ")
         unhovered SetVariable("interakcja_tooltip", "")
 
-# ------------------------------------------------------------------------------------------------
-# EKRAN ZBLIŻENIA: APTECZKA
-# ------------------------------------------------------------------------------------------------
-screen Szpital_Apteczka_Screen():
+# --- 5. EKRAN ZBLIŻENIA APTECZKI ---
+screen Szpital_Apteczka_Screen(nr):
     modal True
     zorder 160
-    add "bg apteczka_zblizenie" #
+    if prad_wlaczony:
+        add "apteczka_zblizenie"
+    else:
+        add "apteczka_zblizenie_no"  
 
     if interakcja_tooltip != "":
         frame:
@@ -1032,46 +1104,43 @@ screen Szpital_Apteczka_Screen():
             xalign 0.5 yalign 0.1
             text "[interakcja_tooltip]" size 24 color "#fff" outlines [(2,"#000", 0,0)]
 
-    # BEZPIECZNIK (Widoczny tylko jeśli go nie mamy)
-    if not ma_bezpiecznik:
+    # Sprawdzamy czy to TA apteczka
+    if nr == ktora_apteczka_ma_bezpiecznik and not ma_bezpiecznik:
         imagebutton:
-            xpos 850 ypos 600 # <--- DOPASUJ WSPÓŁRZĘDNE do przegródki w apteczce!
-            idle "images/item_bezpiecznik_in_box.png" # Grafika bezpiecznika leżącego w pudełku
+            xpos 0 ypos 0 
+            idle "images/item_bezpiecznik_in_box.png" 
             hover "images/item_bezpiecznik_in_box_hover.png"
             focus_mask True
             action [SetVariable("interakcja_tooltip", ""), Hide("Szpital_Apteczka_Screen"), Jump("akcja_zabrania_bezpiecznika")]
             hovered SetVariable("interakcja_tooltip", "WEŹ BEZPIECZNIK")
             unhovered SetVariable("interakcja_tooltip", "")
+    else:
+        # Jeśli apteczka jest pusta
+        text "PUSTO. TYLKO PRZETERMINOWANE LEKI." size 30 color "#fff" align(0.5, 0.5) outlines [(2,"#000",0,0)]
 
-    # PRZYCISK ZAMKNIĘCIA
     textbutton "ZAMKNIJ":
         align (0.5, 0.9)
         text_size 30
         action [SetVariable("interakcja_tooltip", ""), Hide("Szpital_Apteczka_Screen")]
 
-# ------------------------------------------------------------------------------------------------
-# LABELE LOGICZNE (Interakcje)
-# ------------------------------------------------------------------------------------------------
+# --- 6. LABELE LOGICZNE ---
 label akcja_zabrania_bezpiecznika:
     $ ma_bezpiecznik = True
-    
-    # Dodanie do ekwipunku (dostosuj koordynaty w plecaku, np. X=400, Y=500)
     $ backpack.add(przedmiot_bezpiecznik, 0, 0)
     
-    "Twoje palce zaciskają się na chłodnej ceramice bezpiecznika. Wygląda na nienaruszony."
-    
+    "Podnosisz bezpiecznik. Jest nienaruszony."
     show hero_szczesliwy at left
-    ja "Mam go! Główny bezpiecznik przemysłowy. Powinien pasować do generatora."
-    
-    r "Zadziwiające. Statystycznie powinieneś być już martwy. Wracaj do generatora, zanim szczęście cię opuści."
-    
+    ja "W końcu! Mam go. Czas wracać do generatora."
+    r "Nie ociągaj się. Czuję, że systemy podtrzymywania życia zaczynają wibrować w dziwny sposób."
     hide hero_szczesliwy
-    call screen Szpital_Apteczka_Screen # Wraca do widoku otwartej apteczki (już pustej)
+    
+    # POPRAWIONE: Użycie jump zamiast return, aby wrócić do widoku pokoju
+    jump szpital_pokoj2_label 
 
 label szpital_stol_dialog:
-    "Podchodzisz do stołu zabiegowego. Materiał jest podarty, a plamy są zbyt ciemne i gęste, by była to tylko rdza."
-    ja "Co oni tu robili... To nie wygląda na ratowanie życia."
-    r "Próbowali zrozumieć naturę zmian. Sekcja zwłok na żywym organizmie rzadko kończy się sukcesem, ale dostarcza... interesujących danych."
+    "Podchodzisz do stołu. Materiał jest podarty, a plamy są zbyt ciemne, by była to tylko rdza."
+    ja "Co oni tu robili..."
+    r "Próbowali zrozumieć naturę zmian. Sekcja zwłok na żywym organizmie rzadko kończy się sukcesem."
     call screen Szpital_Pokoj1_Screen
 
 #endregion SZPITAL
