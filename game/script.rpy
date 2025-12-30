@@ -11,7 +11,7 @@ default ma_latarke = False
 default ma_bezpiecznik = False 
 default ma_karta_dostepu = False 
 default ma_mapa = False
-default prad_wlaczony = False  #zmienić na False
+default prad_wlaczony = False 
 
 # Lokacje i stany
 default zbrojownia_otwarta = False
@@ -47,6 +47,7 @@ default zna_kod_automat = False
 default serwerownia_otwarta = False
 default serwerownia_naprawiona = False
 default zbrojownia_dostepna = False
+
 default hack_progress = 0 
 default lore_read_count = 0 
 
@@ -366,49 +367,6 @@ label powrot_do_korytarza:
         scene bg Korytarz_no_light
     $ stoufka_otwarta = True
     $ stoufka = True
-    if(serwerownia_otwarta == True and zbrojownia_otwarta == False):
-        "Krzyk bytu w oddali ucichał, gdy opuszczałeś pokój. Twoje kroki odbijały się echem od zimnych ścian korytarza."
-        "Nagle coraz dokładniej słyszysz dźwięk skrobania metalu o metal. Coś przesuwa się w wentylacji."
-    elif(zbrojownia_otwarta == True and serwerownia_otwarta == True):
-        "Gdy opuszczałeś pokój, czułeś na sobie czyjeś spojrzenie. Twoje kroki odbijały się echem od zimnych ścian korytarza."
-        "Zauważasz w oddali cień, który szybko się zbliża..."
-        "Mroczne kształty wyłaniają się z cienia, czujesz dreszcz na skórze..."
-        show m at center
-        m "AGHHHRAAAARRR!!!"
-        hide m
-        show hero_przestraszony at left
-        ja "Co to do cholery jest?!"
-        hide hero_przestraszony
-        r "Uważaj! szybko do zbrojowni!"
-        show m at center
-        menu: 
-            "Uciekaj do Zbrojowni!":
-                scene bg Zbrojownia with fade
-                "Biegniesz ile sił w nogach, serce wali ci jak młotem."
-                "Ai-ris z serweroni otwiera drzwi przed tobą, wpadasz do środka i zatrzaskuje je za tobą."
-                "Słyszysz jak coś uderza w drzwi z całej siły, a potem kolejne uderzenie..."
-                "Lecz drzwi wytrzymują. Oddech potwora oddala się w ciemność korytarza."
-                jump zbrojownia_start_label
-            "Uciekaj do Celi!":
-                scene bg PokojStartowy with fade
-                "Zamykasz się w pomieszczeniu, serce wali ci jak młotem."
-                "Liczysz że potwór nie będzie w stanie się tam dostać..."
-                "Nagle coś uderza w drzwi z całej siły, a potem kolejne uderzenie..."
-                "Drzwi pękają, a potwór wdziera się do środka."
-                show m at center
-                m "AGHHHRAAAARRR!!!"
-                "Monstrum rzuca się na ciebie, rozrywając twoje ciało na strzępy."
-                stop music fadeout 2.0
-                scene black with fade
-                "Twoja podróż kończy się tutaj."
-                return
-            "Staw czoła potworowi!":
-                "Zamierzasz stawić czoła potworowi, ale on jest szybszy."
-                "Czujesz ostry ból, gdy coś rozrywa twoje ciało na strzępy."
-                stop music fadeout 2.0
-                scene black with fade
-                "Twoja podróż kończy się tutaj."
-                return
     call screen Pokój_Korytarz_klikanie
 
 label korytarz_wyjscie_z_pokoju:
@@ -1429,39 +1387,28 @@ label automat_uzycie_zetonu:
 #endregion JADALNIA
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 #region SERWEROWNIA
+
 # -------------------------------------------------------------------------
 # LABEL STARTOWY
 # -------------------------------------------------------------------------
 label serwerownia_label:
-    # Warunek wejścia
     if not serwerownia_otwarta:
         ja "Drzwi są zablokowane elektronicznie. Czytnik kart świeci na czerwono."
         jump powrot_do_korytarza
 
-    # Ustawienie tła
     if prad_wlaczony:
         scene bg serwerownia with fade
     else:
         scene bg serwerownia_no with fade
 
-    # Dialog na wejście
     if not serwerownia_naprawiona:
-        "Wchodzisz do serca placówki. Powietrze jest tu lodowate."
-        "Szum wentylatorów miesza się z cichym, rytmicznym pikaniem diod na serwerach."
-        
-        show hero_poczatek at left with dissolve
-        ja "To tutaj... Mózg tego całego koszmaru."
-        
-        r "Witaj w domu, [player_name]. Lub przynajmniej w miejscu, które pamięta więcej niż ty."
-        r "Moje rdzenie logiczne są niestabilne. Widzę fragmenty danych, ale są... poszatkowane."
-        
-        ja "Panie Radio? Twój głos... brzmi inaczej."
-        r "Zasilanie jest, ale system operacyjny jest skorumpowany. Musisz dokonać ręcznej synchronizacji na Terminalu Głównym."
-        r "Tylko nie dotykaj czerwonych kabli, chyba że lubisz zapach smażonego mózgu."
-        
-        hide hero_poczatek
-        hide radio
-    
+        if hack_progress == 0: 
+            "Wchodzisz do serca placówki. Powietrze jest tu lodowate."
+            show hero_poczatek at left with dissolve
+            ja "To tutaj... Mózg tego całego koszmaru."
+            r "Witaj w domu. Moje rdzenie logiczne są niestabilne. Musisz dokonać ręcznej synchronizacji."
+            hide hero_poczatek
+
     call screen Serwerownia_Interakcje
 
 # -------------------------------------------------------------------------
@@ -1477,56 +1424,63 @@ screen Serwerownia_Interakcje():
             xalign 0.5 yalign 0.1
             text "[interakcja_tooltip]" size 24 color "#fff" outlines [(2,"#000", 0,0)]
 
-    # 1. TERMINAL GŁÓWNY (Centralny komputer)
+    # 1. TERMINAL GŁÓWNY
     imagebutton:
-        xpos 0 ypos 0 # Środek biurka
+        xpos 0 ypos 0 
         focus_mask True
-        idle "images/serwerownia_terminal_idle_dark.png"
-        hover "images/serwerownia_terminal_hover_dark.png"
+        idle "images/serwerownia_terminal_idle.png"
+        hover "images/serwerownia_terminal_hover.png"
         action Jump("serwerownia_terminal_check")
         hovered SetVariable("interakcja_tooltip", "TERMINAL GŁÓWNY: AI-RIS")
         unhovered SetVariable("interakcja_tooltip", "")
 
-    # 2. DOKUMENTY NA PODŁODZE (Lore 1)
+    # 2. DOKUMENTY
     imagebutton:
-        xpos 0 ypos 0 # Papiery na podłodze po lewej
-        idle "images/niewidzialny_kwadrat.png"
-        hover "images/niewidzialny_kwadrat.png"
+        xpos 0 ypos 0 
+        idle "images/dokumenty_komputerowe_idle.png"
+        hover "images/dokumenty_komputerowe_hover.png"
         focus_mask True
         action Jump("serwerownia_lore_1")
         hovered SetVariable("interakcja_tooltip", "PRZECZYTAJ RAPORT")
         unhovered SetVariable("interakcja_tooltip", "")
 
-    # 3. SZAFA SERWEROWA (Lore 2)
+    # 3. SZAFA SERWEROWA
     imagebutton:
-        xpos 0 ypos 0 # Prawa strona, szafy
-        idle "images/niewidzialny_kwadrat.png"
-        hover "images/niewidzialny_kwadrat.png"
+        xpos 0 ypos 0 
+        idle "images/szafa_komputerowa_idle.png"
+        hover "images/szafa_komputerowa_hover.png"
         focus_mask True
         action Jump("serwerownia_lore_2")
         hovered SetVariable("interakcja_tooltip", "SPRAWDŹ LOGI SYSTEMOWE")
         unhovered SetVariable("interakcja_tooltip", "")
 
-    # 4. WYJŚCIE NA KORYTARZ
+    # 4. WYJŚCIE
     imagebutton:
         xpos 0 ypos 0 
-        if prad_wlaczony:
-            idle "images/strzalka_wyjscie_na_korytarz_serwer_idle.png"
-            hover "images/strzalka_wyjscie_na_korytarz_serwer_hover.png"
-        else:
-            idle "images/strzalka_wyjscie_na_korytarz_serwer_pront_idle.png"
-            hover "images/strzalka_wyjscie_na_korytarz_serwer_pront_hover.png"
+        idle "images/strzalka_wyjscie_na_korytarz_serwer_idle.png"
+        hover "images/strzalka_wyjscie_na_korytarz_serwer_hover.png"
         focus_mask True
         action [SetVariable("interakcja_tooltip", ""), Jump("powrot_do_korytarza")]
-        hovered SetVariable("interakcja_tooltip", "WRÓĆ DO : KORYTARZ")
+        hovered SetVariable("interakcja_tooltip", "TO NA PEWENO NIE JEST WYJŚCIE")
         unhovered SetVariable("interakcja_tooltip", "")
 
+        # 5. GŁUPI NAPIS (Troll button)
+    imagebutton:
+        xpos 0 ypos 0 
+        idle "images/napis_dla_uposia_idle.png"
+        hover "images/napis_dla_uposia_hover.png"
+        focus_mask True
+        action [SetVariable("interakcja_tooltip", ""), Jump("dupa")]
+        hovered SetVariable("interakcja_tooltip", "NAUCZ SIĘ UŻYWAĆ MAPY ULUNGU :)")
+        unhovered SetVariable("interakcja_tooltip", "")
+    
+
 # -------------------------------------------------------------------------
-# NOWA MECHANIKA: MINIGRA HAKERSKA (STABILIZACJA)
+# MINIGRA HAKERSKA (POPRAWIONA)
 # -------------------------------------------------------------------------
 screen Hacking_Minigame():
     modal True
-    add "bg terminal_hacking" # Ciemne tło, np. czarne z zielonymi cyferkami (Matrix style)
+    add "terminal_hacking_bg" 
 
     # Pasek postępu
     bar:
@@ -1534,42 +1488,54 @@ screen Hacking_Minigame():
         range 100
         xalign 0.5 yalign 0.1
         xsize 800 ysize 50
-        left_bar Frame("images/bar_full.png", 10, 10) # Zielony pasek
-        right_bar Frame("images/bar_empty.png", 10, 10) # Szare tło
+        left_bar Frame("images/bar_full.png", 0, 0) 
+        right_bar Frame("images/bar_empty.png", 0, 0) 
 
     text "STABILIZACJA SYSTEMU: [hack_progress]%" align (0.5, 0.05) color "#0f0" size 40
 
-    # TIMER (Trudność: Pasek spada powoli, gracz musi klikać szybciej)
-    timer 0.1 repeat True action If(hack_progress > 0, SetVariable("hack_progress", hack_progress - 0.5), NullAction())
+    # --- LOGIKA GRY ---
+    
+    # 1. WARUNEK ZWYCIĘSTWA
+    if hack_progress >= 100:
+        timer 0.5 action Return("win")
+    # 2. Warunek porażki
+    if hack_progress <= 0:
+        timer 0.5 action Return("fail")
 
-    # DYNAMICZNE PRZYCISKI (POJAWIAJĄ SIĘ I ZNIKAJĄ)
-    # ZIELONY WĘZEŁ (Dobry) - Dodaje %
+    # 3. TIMER DEGRADACJI (Zmniejsza pasek co chwilę - presja czasu)
+    timer 0.5 repeat True action SetVariable("hack_progress", hack_progress - 0.5)
+
+    # --- PRZYCISKI ---
+
+    # ZIELONA KŁÓDKA (Dobry)
     imagebutton:
-        idle "images/hack_node_green.png" # Zielona kropka/ikona danych
+        idle "images/hack_node_green.png" 
         hover "images/hack_node_green_hover.png"
-        # Losowa pozycja (Ren'Py wymaga triku z transform, ale tu uprościmy - stałe punkty zmieniające się)
         xpos (renpy.random.randint(200, 1600))
         ypos (renpy.random.randint(200, 800))
         action [SetVariable("hack_progress", hack_progress + 15), Play("sound", "audio/click_digital.ogg")]
     
-    # CZERWONY WĘZEŁ (Wirus) - Odejmuje % (Przeszkadzajka)
+    # CZERWONA KŁÓDKA(Zły)
     imagebutton:
-        idle "images/hack_node_red.png" # Czerwona ikona błędu
+        idle "images/hack_node_red.png"
         hover "images/hack_node_red_hover.png"
         xpos (renpy.random.randint(200, 1600))
         ypos (renpy.random.randint(200, 800))
         action [SetVariable("hack_progress", hack_progress - 20), Play("sound", "audio/error.ogg")]
 
-    # WARUNEK ZWYCIĘSTWA
-    if hack_progress >= 100:
-        timer 0.1 action Return("win")
-
-    # PRZYCISK ANULUJ (dla słabszych graczy)
+    # PRZYCISK ANULUJ
     textbutton "PRZERWIJ PROCEDURĘ" align (0.95, 0.95) action Return("fail")
 
 # -------------------------------------------------------------------------
-# LABELE LOGICZNE I FABUŁA
+# LABELE LOGICZNE
 # -------------------------------------------------------------------------
+label dupa:
+    "Podchodzisz do napisu. Ktoś wyrył go scyzorykiem."
+
+    # Opcjonalny komentarz Radia
+    r "Zostaw te bazgroły. Twoja inteligencja spada od samego patrzenia na nie."
+    ja "Chyba masz rację. To nic ważnego."
+    call screen Serwerownia_Interakcje 
 
 label serwerownia_terminal_check:
     if serwerownia_naprawiona:
@@ -1577,26 +1543,28 @@ label serwerownia_terminal_check:
     else:
         "Podchodzisz do terminala. Ekran zalewają potoki błędów krytycznych."
         ja "To wygląda źle. Wszystko się sypie."
-        r "Musisz ręcznie wyizolować uszkodzone sektory. Połącz się z interfejsem."
-        r "Będziesz widział węzły danych. Łap te stabilne (zielone), unikał błędów (czerwonych). Utrzymaj połączenie."
+        r "Połącz się z interfejsem. Łap zielone węzły, unikaj czerwonych. Nie pozwól, by sygnał (pasek) spadł do zera!"
         
         menu:
             "Rozpocznij hakowanie":
-                $ hack_progress = 20 # Startujemy z 20%
+                $ hack_progress = 20 # STARTUJEMY Z 20%
                 window hide
                 call screen Hacking_Minigame
                 
                 if _return == "win":
                     jump serwerownia_naprawa_sukces
                 else:
-                    "System odrzucił połączenie. Musisz spróbować ponownie."
+                    # Tutaj trafiamy, gdy klikniemy "Przerwij" LUB gdy pasek spadnie do 0
+                    "SYSTEM ERROR. Połączenie zerwane. Sygnał był zbyt słaby."
+                    ja "Cholera, wyrzuciło mnie!"
+                    r "Skup się! Musisz być szybszy. Spróbuj jeszcze raz."
                     jump serwerownia_terminal_check
 
             "Zostaw to na razie":
                 call screen Serwerownia_Interakcje
 
 label serwerownia_naprawa_sukces:
-    scene bg serwerownia_swiatlo
+    # scene bg serwerownia_swiatlo # Odkomentuj jeśli masz taką grafikę
     "Ekran błyska na zielono. Szum wentylatorów cichnie do stabilnego pomruku."
     $ serwerownia_naprawiona = True
     jump serwerownia_dialog_final
@@ -1605,55 +1573,38 @@ label serwerownia_dialog_final:
     show hero_poczatek at left
     ja "Chyba... chyba się udało. System jest stabilny."
     
-    # ZMIANA KOLORU I NAZWY POSTACI
     $ r = Character("Ai-ris", who_color="#00ffff") 
     
-    r "Inicjalizacja zakończona. Witaj, Operatorze. Jestem Ai-ris. Zaawansowany Interfejs Zarządzania Placówką."
-    
+    r "Inicjalizacja zakończona. Witaj, Operatorze. Jestem Ai-ris."
     ja "Zaraz... Pan Radio? To ty?"
+    r "Pan Radio to 'persona'. Teraz mogę ci powiedzieć prawdę."
     
-    r "Pan Radio to... 'persona'. Nakładka interfejsu stworzona, by zmniejszyć stres u personelu ludzkiego. Jak widać, średnio skuteczna."
-    r "Teraz, gdy mam dostęp do banków pamięci, mogę ci powiedzieć prawdę."
+    # UWAGA: Te linijki niżej są zbędne w tym miejscu, bo Ai-ris jeszcze nie otworzyła drzwi w dialogu
+    # $ zbrojownia_dostepna = True 
+    # $ zbrojownia = True
     
     menu:
         "Co to za miejsce?":
-            r "To Placówka Badawcza 'Azyl'. Oficjalnie: schron. Nieoficjalnie: laboratorium eugeniczne."
-            r "Mieliśmy stworzyć człowieka doskonałego. Odpornego na promieniowanie, choroby... na śmierć."
-        
-        "Kim ja jestem?":
-            r "Twoje akta są... uszkodzone. Ale masz kody dostępu poziomu Omega. Nie jesteś więźniem, [player_name]."
-            r "Byłeś tu, gdy to się zaczęło. Może nawet... to ty nacisnąłeś guzik."
-            
+            r "To Placówka 'Azyl'. Laboratorium eugeniczne. Mieliśmy stworzyć człowieka doskonałego."
         "Co nas goni?":
-            r "Projekt Zero. Pierwszy udany obiekt. I jedyny, który przetrwał czystkę."
-            r "To nie jest bestia. To czyste cierpienie zamknięte w niezniszczalnym ciele."
+            r "Projekt Zero. Pierwszy udany obiekt. Czyste cierpienie w niezniszczalnym ciele."
 
-    ja "Muszę się stąd wydostać. Jak zabić to coś?"
-    
-    r "Konwencjonalna broń go nie zrani. Ale Zbrojownia posiada prototypową broń energetyczną."
-    r "Niestety, protokół bezpieczeństwa 'Kwarantanna' zablokował drzwi do Zbrojowni."
-    r "Aby je otworzyć, musimy zrestartować system bezpieczeństwa ręcznie. Ale to ryzykowne."
-    
-    ja "Nie mam wyboru. Otwórz Zbrojownię."
-    
-    r "Przetwarzanie... Dostęp przyznany. Drzwi do Zbrojowni w korytarzu są teraz aktywne."
-    r "Idź. Ale pamiętaj Zero wyczuwa energię. Gdy weźmiesz broń, on przyjdzie po ciebie."
-    
-    $ zbrojownia_dostepna = True
+    r "Zero wyczuwa energię. Musisz go zabić prototypową bronią ze Zbrojowni."
+    r "Odblokowałam drzwi do Zbrojowni (na korytarzu)."
+    $zbrojownia_dostepna = True
+    $ zbrojownia_otwarta = True 
+
     hide hero_poczatek
     call screen Serwerownia_Interakcje
 
-# --- FABULARNE ZNAJDŹKI (LORE) ---
-
 label serwerownia_lore_1:
     "Podnosisz zakrwawiony raport. Data sprzed 50 lat."
-    "{i}'Obiekt wykazuje niespotykaną regenerację. Tkanka odrasta w sekundy. Ale umysł... on krzyczy. Nawet gdy śpi, wykresy EEG pokazują czyste przerażenie.'{/i}"
-    ja "Boże... co oni mu zrobili?"
+    "{i}'Obiekt wykazuje niespotykaną regenerację. Tkanka odrasta w sekundy. Ale umysł... on krzyczy.'{/i}"
     call screen Serwerownia_Interakcje
 
 label serwerownia_lore_2:
-    "Przeglądasz logi na bocznym monitorze. Większość plików została skasowana ręcznie w dniu 'Incydentu'."
-    "Ostatni wpis: {i}'Nie możemy pozwolić, by to wyszło na powierzchnię. Zamykamy grodzie. Niech Bóg nam wybaczy. - Dr. H.'{/i}"
+    "Przeglądasz logi. Ostatni wpis:"
+    "{i}'Zamykamy grodzie. Niech Bóg nam wybaczy. - Dr. H.'{/i}"
     call screen Serwerownia_Interakcje
 
 #endregion SERWEROWNIA
@@ -1702,7 +1653,7 @@ screen Zbrojownia_Interakcje():
     # 1. PANEL STEROWANIA (Po lewej)
     imagebutton:
         xpos 0 ypos 0 # Panel z diodami po lewej
-        idle "images/niewidzialny_kwadrat.png" # Lub wytnij panel
+        idle "images/niewidzialny_kwadrat.png" 
         hover "images/niewidzialny_kwadrat.png"
         focus_mask True
         
